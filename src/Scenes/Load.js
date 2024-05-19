@@ -7,11 +7,14 @@ class Load extends Phaser.Scene {
         this.load.setPath("./assets/");
 
         // Load characters spritesheet
-        this.load.atlas("platformer_characters", "tilemap-characters-packed.png", "tilemap-characters-packed.json");
+        this.load.atlas("platformer_characters", "sprites_packed.png", "sprites_packed.json");
 
         // Load tilemap information
-        this.load.image("tilemap_tiles", "tilemap_packed.png");                         // Packed tilemap
-        this.load.tilemapTiledJSON("platformer-level-1", "platformer-level-1.tmj");   // Tilemap in JSON
+        this.load.image("tilemap_packed", "monochrome_tilemap_transparent_packed.png");                         // Packed tilemap
+        this.load.tilemapTiledJSON("lvl1", "lvl1.tmj");   // Tilemap in JSON
+
+        // this.load.image("particles", "particles.png");  
+        this.load.atlas("particles", "particles.png", "particles.json");
     }
 
     create() {
@@ -19,8 +22,8 @@ class Load extends Phaser.Scene {
             key: 'walk',
             frames: this.anims.generateFrameNames('platformer_characters', {
                 prefix: "tile_",
-                start: 0,
-                end: 1,
+                start: 241,
+                end: 244,
                 suffix: ".png",
                 zeroPad: 4
             }),
@@ -32,7 +35,7 @@ class Load extends Phaser.Scene {
             key: 'idle',
             defaultTextureKey: "platformer_characters",
             frames: [
-                { frame: "tile_0000.png" }
+                { frame: "tile_0240.png" }
             ],
             repeat: -1
         });
@@ -41,10 +44,64 @@ class Load extends Phaser.Scene {
             key: 'jump',
             defaultTextureKey: "platformer_characters",
             frames: [
-                { frame: "tile_0001.png" }
+                { frame: "tile_0244.png" }
             ],
         });
 
+        // Particle config
+
+        this.anims.create({
+            key: 'particles0',
+            frames: this.anims.generateFrameNames('particles', {
+                prefix: "tile_",
+                start: 0,
+                end: 3,
+                suffix: ".png",
+                zeroPad: 4
+            }),
+            frameRate: 15,
+            repeat: -1,
+        }); 
+
+        this.anims.create({
+            key: 'particles1',
+            frames: this.anims.generateFrameNames('particles', {
+                prefix: "tile_",
+                start: 4,
+                end: 7,
+                suffix: ".png",
+                zeroPad: 4
+            }),
+            frameRate: 15,
+            repeat: -1,
+        }); 
+
+        this.anims.create({
+            key: 'particles2',
+            frames: this.anims.generateFrameNames('particles', {
+                prefix: "tile_",
+                start: 8,
+                end: 11,
+                suffix: ".png",
+                zeroPad: 4
+            }),
+            frameRate: 15,
+            repeat: -1,
+        }); 
+
+        this.anims.create({
+            key: 'particles3',
+            frames: this.anims.generateFrameNames('particles', {
+                prefix: "tile_",
+                start: 11,
+                end: 15,
+                suffix: ".png",
+                zeroPad: 4
+            }),
+            frameRate: 15,
+            repeat: -1,
+        }); 
+        
          // ...and pass to the next Scene
          this.scene.start("platformerScene");
     }

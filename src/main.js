@@ -29,13 +29,18 @@ let config = {
             }
         }
     },
-    width: 1440,
-    height: 900,
+    width: 600,
+    height: 400,
+    fps:30,
     scene: [Load, Platformer]
 }
 
 var cursors;
 const SCALE = 2.0;
+const PPU = 16;
 var my = {sprite: {}, text: {}};
+var world=0;
+var respawnX=0;
+var respawnY=0;
 
 const game = new Phaser.Game(config);
