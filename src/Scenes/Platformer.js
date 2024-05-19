@@ -12,8 +12,8 @@ class Platformer extends Phaser.Scene {
         this.MAX_SPEED = 350;
 
         this.dead = false;
+        score = 0;
 
-        this.gems = 0;
         this.frame = 0;
     }
 
@@ -21,10 +21,19 @@ class Platformer extends Phaser.Scene {
         respawnX=game.config.width/4;
         respawnY=game.config.height/4;
     }
+    
+    handlePlayerPlatformCollision(obj1, obj2)
+    {
+        this.time.delayedCall(700,()=>{
+            if(obj != null){
+                obj2.destroy();
+            }
+        });
+    }
 
     create() {
         this.physics.world.drawDebug = false;
-        let mapW = 116;
+        let mapW = 102;
         let mapH = 12;
         this.map = this.add.tilemap("lvl1", 16, 16, mapW, mapH);
 
@@ -34,8 +43,8 @@ class Platformer extends Phaser.Scene {
         this.tileset = this.map.addTilesetImage("monochrome_tilemap_transparent_packed", "tilemap_packed");
 
         // Create a layer
-        this.groundLayer = this.map.createLayer("Tile Layer 1", this.tileset, 0, 0);
-        this.groundLayer.setScale(2.0);
+        this.groundLayer = this.map.createLayer("Ground", this.tileset, 0, 0);
+        this.groundLayer.setScale(SCALE);
 
         // Make it collidable
         this.groundLayer.setCollisionByProperty({
@@ -43,13 +52,63 @@ class Platformer extends Phaser.Scene {
         });
 
         // set up player avatar
-                console.log("load respawn "+respawnX + " " + respawnY);
+        console.log("load respawn "+respawnX + " " + respawnY);
         my.sprite.player = this.physics.add.sprite(respawnX, respawnY, "platformer_characters", "tile_0000.png").setScale(SCALE)
         my.sprite.player.setCollideWorldBounds(true);
 
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
 
+
+        this.gems = this.map.createFromObjects("Gems", {
+            name: "Gem",
+            key: "tilemap_sheet",
+            frame: 62
+        });
+        this.gems.map((obj) => {
+            obj.x *= SCALE;
+            obj.y *= SCALE;
+            obj.setScale(SCALE);
+        });
+        this.physics.world.enable(this.gems, Phaser.Physics.Arcade.STATIC_BODY);
+        this.gemGroup = this.add.group(this.gems);
+        this.physics.add.overlap(my.sprite.player, this.gemGroup, (obj1, obj2) => {
+            obj2.destroy(); // remove coin on overlap
+            score++;
+        });
+
+
+        this.platforms = this.map.createFromObjects("Platforms", {
+            name: "Platform",
+            key: "tilemap_sheet",
+            frame: 103
+        });
+        this.platforms.map((obj) => {
+            obj.x *= SCALE;
+            obj.y *= SCALE;
+            obj.setScale(SCALE);
+        });
+
+        this.physics.world.enable(this.platforms, Phaser.Physics.Arcade.STATIC_BODY);
+        this.platformGroup = this.add.group(this.platforms);
+        this.physics.add.collider(my.sprite.player, this.platformGroup);
+
+        this.doors = this.map.createFromObjects("Door", {
+            name: "Door",
+            key: "tilemap_sheet",
+            frame: 56
+        });
+        this.doors.map((obj) => {
+            obj.x *= SCALE;
+            obj.y *= SCALE;
+            obj.setScale(SCALE);
+        });
+        this.physics.world.enable(this.doors, Phaser.Physics.Arcade.STATIC_BODY);
+        this.doorGroup = this.add.group(this.doors);
+        this.physics.add.overlap(my.sprite.player, this.doorGroup, (obj1, obj2) => {
+            //win
+             this.scene.start("Win");
+        });
         
         this.groundLayer.forEachTile((tile) => {
             if (tile.properties.platform) {
@@ -115,9 +174,12 @@ class Platformer extends Phaser.Scene {
     }
 
     death(){
-        this.poof(my.sprite.player.x,my.sprite.player.y);
-        this.dead= true;
-        this.time.delayedCall(200,()=>this.scene.start("platformerScene"));
+        if(!this.dead){
+            this.poof(my.sprite.player.x,my.sprite.player.y);
+            this.dead= true;
+            this.time.delayedCall(200,()=>this.scene.start("platformerScene"));
+            deaths++;
+        }
     }
 
     poof(x,y){
@@ -194,6 +256,7 @@ class Platformer extends Phaser.Scene {
                 respawnX = tile.getCenterX(this.cameras.main);
                 respawnY = tile.getCenterY(this.cameras.main);
                 console.log("set respawn "+respawnX + " " + respawnY);
+                this.poof(respawnX,respawnY);
             }
         }
         if(my.sprite.player.body.blocked.down){

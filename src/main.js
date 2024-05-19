@@ -12,6 +12,9 @@
 // debug with extreme prejudice
 "use strict"
 
+var canvas_x = 600;
+var canvas_y = 400;
+
 // game config
 let config = {
     parent: 'phaser-game',
@@ -29,10 +32,10 @@ let config = {
             }
         }
     },
-    width: 600,
-    height: 400,
+    width: canvas_x,
+    height: canvas_y,
     fps:30,
-    scene: [Load, Platformer]
+    scene: [Load, Platformer, Win]
 }
 
 var cursors;
@@ -42,5 +45,7 @@ var my = {sprite: {}, text: {}};
 var world=0;
 var respawnX=0;
 var respawnY=0;
+var score = 0;
+var deaths = 0;
 
 const game = new Phaser.Game(config);

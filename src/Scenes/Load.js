@@ -15,6 +15,11 @@ class Load extends Phaser.Scene {
 
         // this.load.image("particles", "particles.png");  
         this.load.atlas("particles", "particles.png", "particles.json");
+
+        this.load.spritesheet("tilemap_sheet", "monochrome_tilemap_transparent_packed.png", {
+            frameWidth: 16,
+            frameHeight: 16
+        });
     }
 
     create() {
