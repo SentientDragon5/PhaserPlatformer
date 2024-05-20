@@ -114,37 +114,6 @@ class Platformer extends Phaser.Scene {
             if (tile.properties.platform) {
                 tile.setCollision(false, false, true, false);
             }
-            if(tile.properties.falls){
-                tile.bounceOffsetMax = 0.05;
-                tile.bounceOffsetMin = -0.05;
-                tile.bounceDir = 1;
-                tile.bounceSpeed = 1.0;
-                tile.originY = tile.pixelY;
-
-                tile.destroyStart = false;
-                // tile.setCollisionCallback(()=>{
-                //     console.log("blah");
-                //     this.gems++;
-                //     tile.destroy();
-                // }, null);
-            }
-            if(tile.properties.gem){
-                tile.bounceOffsetMax = 1;
-                tile.bounceOffsetMin = -1;
-                tile.bounceDir = 1;
-                tile.bounceSpeed = 1.0/8.0;
-                tile.originY = tile.pixelY;
-                // tile.setCollisionCallback(()=>{
-                //     console.log("blah");
-                //     this.gems++;
-                //     tile.destroy();
-                // }, null);
-            }
-            // if(tile.properties.danger){
-            //     tile.setCollisionCallback(()=>{
-            //         console.log("blahb");
-            //     }, null);
-            // }
         });
 
 
@@ -171,6 +140,16 @@ class Platformer extends Phaser.Scene {
 
         //Debug particle
         // this.poof(100,100);
+
+        my.vfx_walking = this.add.particles(0,0,'moveFX',{
+            scale: 1,
+            alpha: {start: 1, end:0},
+            lifespan: 500,
+            frequency: 5,
+            speedY: {min:0,max:10},
+            speedX: {min:-50,max:50},
+            anim: ["particles0","particles1","particles2","particles3"]
+        });
     }
 
     death(){
@@ -208,6 +187,13 @@ class Platformer extends Phaser.Scene {
                 
                 my.sprite.player.setFlip(true, false);
                 my.sprite.player.anims.play('walk', true);
+
+
+                my.vfx_walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
+                my.vfx_walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+                if (my.sprite.player.body.blocked.down) {
+                    my.vfx_walking.start();
+                }
     
             } else if(cursors.right.isDown) {
                 // TODO: have the player accelerate to the right
@@ -216,6 +202,12 @@ class Platformer extends Phaser.Scene {
     
                 my.sprite.player.resetFlip();
                 my.sprite.player.anims.play('walk', true);
+
+                my.vfx_walking.startFollow(my.sprite.player, my.sprite.player.displayWidth/2-10, my.sprite.player.displayHeight/2-5, false);
+                my.vfx_walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+                if (my.sprite.player.body.blocked.down) {
+                    my.vfx_walking.start();
+                }
     
             } else {
                 // TODO: set acceleration to 0 and have DRAG take over
@@ -223,12 +215,16 @@ class Platformer extends Phaser.Scene {
                 my.sprite.player.body.setDragX(this.DRAG);
     
                 my.sprite.player.anims.play('idle');
+
+                my.vfx_walking.stop();
             }
     
             // player jump
             // note that we need body.blocked rather than body.touching b/c the former applies to tilemap tiles and the latter to the "ground"
             if(!my.sprite.player.body.blocked.down) {
                 my.sprite.player.anims.play('jump');
+
+                my.vfx_walking.stop();
             }
             if(my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
                 // TODO: set a Y velocity to have the player "jump" upwards (negative Y direction)
@@ -245,50 +241,17 @@ class Platformer extends Phaser.Scene {
             if(tile.properties.danger){
                 this.death();
             }
-            // if(tile.properties.falls){
-            //     // tile.destroy();
-            //     this.groundLayer.removeTileAtWorldXY(my.sprite.player.x,my.sprite.player.y);
-            //     this.poof(my.sprite.player.x,my.sprite.player.y);
-            // }
 
             if(tile.properties.respawn){
                 var pos = this.cameras.main.getWorldPoint(my.sprite.player.x,my.sprite.player.y);
-                respawnX = tile.getCenterX(this.cameras.main);
-                respawnY = tile.getCenterY(this.cameras.main);
-                console.log("set respawn "+respawnX + " " + respawnY);
-                this.poof(respawnX,respawnY);
-            }
-        }
-        if(my.sprite.player.body.blocked.down){
-            var tile = this.groundLayer.getTileAtWorldXY(my.sprite.player.x,my.sprite.player.y+PPU*SCALE);
-            if(tile != null){
-                if(tile.properties.falls){
-                    // tile.destroy();
-                    if(!tile.destroyStart){
-                        tile.destroyStart = true;
-                        this.time.delayedCall(700,()=>this.groundLayer.removeTileAt(tile.x,tile.y));
-                        this.poof(tile.pixelX,tile.pixelY);
-                    }
+                if(respawnX != tile.getCenterX(this.cameras.main) && respawnY != tile.getCenterY(this.cameras.main)){
+                    respawnX = tile.getCenterX(this.cameras.main);
+                    respawnY = tile.getCenterY(this.cameras.main);
+                    console.log("set respawn "+respawnX + " " + respawnY);
+                    this.poof(respawnX,respawnY);
                 }
             }
         }
-        this.groundLayer.forEachTile((tile) => {
-            if(tile.properties.gem){
-                tile.pixelY += tile.bounceDir * tile.bounceSpeed;
-                if(tile.pixelY-tile.originY > tile.bounceOffsetMax || tile.pixelY-tile.originY < tile.bounceOffsetMin){
-                    tile.bounceDir *= -1;
-                }
-            }
-            if(tile.properties.falls){
-                if(tile.destroyStart){
-                    tile.pixelY += tile.bounceDir * tile.bounceSpeed;
-                    if(tile.pixelY-tile.originY > tile.bounceOffsetMax || tile.pixelY-tile.originY < tile.bounceOffsetMin){
-                        tile.bounceDir *= -1;
-                    }
-
-                }
-            }
-        });
 
         this.frame++;
     }
