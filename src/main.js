@@ -35,7 +35,10 @@ let config = {
     width: canvas_x,
     height: canvas_y,
     fps:30,
-    scene: [Load, Platformer, Win]
+    scene: [Load, Platformer, Win],
+    audio: {
+        disableWebAudio: true
+    }
 }
 
 var cursors;

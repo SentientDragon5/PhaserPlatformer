@@ -20,6 +20,12 @@ class Load extends Phaser.Scene {
             frameWidth: 16,
             frameHeight: 16
         });
+
+        // Audio
+        // Sound Effect from <a href="https://pixabay.com/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6462">Pixabay</a>
+        this.load.audio('jumpsfx',"cartoon-jump-6462.mp3" );
+        //Music by <a href="https://pixabay.com/users/lesfm-22579021/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=116216">Oleksii Kaplunskyi</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=116216">Pixabay</a>
+        this.load.audio('music', "waiting-music-116216.mp3" );
     }
 
     create() {

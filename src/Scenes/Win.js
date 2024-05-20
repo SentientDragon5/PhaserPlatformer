@@ -11,6 +11,10 @@ class Win extends Phaser.Scene {
     create() {
         // Pixelify Sans
 
+        respawnX=game.config.width/4;
+        respawnY=game.config.height/4;
+
+        
         var style = { font: "32px Verdana", fill: "#ffffff", align: "center" };
         var mainLabel = this.add.text(canvas_x/2 - 110, canvas_y/2, "You Win!!", style);
         

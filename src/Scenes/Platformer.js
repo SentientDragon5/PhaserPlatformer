@@ -150,6 +150,17 @@ class Platformer extends Phaser.Scene {
             speedX: {min:-50,max:50},
             anim: ["particles0","particles1","particles2","particles3"]
         });
+
+
+        this.jumpsfx = this.sound.add('jumpsfx', {
+            volume: 0.5,
+            loop: false
+        });
+        this.music = this.sound.add('music', {
+            volume: 0.7,
+            loop: true
+        });
+        this.music.play();
     }
 
     death(){
@@ -229,6 +240,8 @@ class Platformer extends Phaser.Scene {
             if(my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
                 // TODO: set a Y velocity to have the player "jump" upwards (negative Y direction)
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+
+                this.jumpsfx.play();
             }
         }
 
